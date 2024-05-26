@@ -14,7 +14,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm">
-                <form method="POST" enctype="multipart/form-data" action={{route('admin.sampleImageUploader1.post')}}>
+                <form id="createForm" method="POST" enctype="multipart/form-data" action={{route('admin.sampleImageUploader1.post')}}>
                     @csrf
                     <x-adminlte-input name="name" label="name" placeholder="name" fgroup-class="col-md-6" value={{$name}}/>
                     <x-form.sample-select name="testSelet1" value="" label="testSelet1" placeholder="placeholder" :options="[1 => 'Option 1', 2 => 'Option 2', 3 => 'Option 3']"/>
@@ -23,6 +23,11 @@
                             empty-option="Select an option..."/>
                     </x-adminlte-select>  --}}
                     <x-form.sample-input-date name="statr_time" value="" startValue=""/>
+
+                    <x-form.sample-text-area name="testTestArea" value=""/>
+
+                    <x-form.sample-checkbox name="testCheckbox" value=""/>
+                    <x-form.sample-radio-button name="testRadioButton" value=""/>
 
                     {{--  <div class="form-group col-md-6">
                         <label for="testDate">inputDate</label>
@@ -41,13 +46,12 @@
                             </span>
                         @enderror
                     </div>  --}}
-                    <div class="form-group col-md-6">
+                    {{--  <div class="form-group col-md-6">
                         <label for="exampleFormControlFile1">Example file input</label>
                         <input type="file" name="exampleFormControlFile1" placeholder="input file" :value=$image class="form-control-file">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="exampleFormControlFile1">Example file input</label>
-                        {{--  <input type="file" name="exampleFormControlFile1" placeholder="input file" :value=$image class="form-control-file">  --}}
                         <div class="input-group">
                             <div class="custom-file">
                                 <input type="file" name="exampleFormControlFile1" placeholder="input file" :value=$image class="form-control-file">
@@ -55,7 +59,7 @@
                             </div>
                         </div>
                     </div>
-                    <x-adminlte-input-file name="file" label="upload file" fgroup-class="col-md-6" :value="$image"/>
+                    <x-adminlte-input-file name="file" label="upload file" fgroup-class="col-md-6" :value="$image"/>  --}}
                     {{--  <x-adminlte-select2 name="testSelet2" label="testSelect2" fgroup-class="col-md-6">
                         <option>Option 1</option>
                         <option disabled>Option 2</option>
@@ -64,14 +68,14 @@
 
                     <div class="form-group col-md-6">
                         <label for="testImage">inputDate</label>
-                        <x-form.sample-file-input name="testFileTest" value="" :isPreview="true" :isMultiple="true" />
+                        <x-form.sample-file-input name="testFileTest" value="" :isPreview="true" :isMultiple="false" />
                     </div>
 
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-6 my-2">
                         <div class="container">
                             <div class="row">
                                 <div class="col-sm">
-                                    <x-adminlte-button label="Submit" type="submit" theme="success" icon="fas fa-thumbs-up"/>
+                                    <x-adminlte-button id="createFormButton" label="Submit" type="submit" theme="success" icon="fas fa-thumbs-up" disabled/>
                                 </div>
                             </div>
                         </div>
@@ -92,4 +96,48 @@
             </div>
         </div>
     </div>
+@stop
+
+@section('js')
+    @parent
+    <script>
+        initFormComponent('createForm', 'createFormButton');
+
+        /**
+        * initialize
+        * @param {string} id
+        * @param {string} submitId
+        * @return {void}
+        */
+        function initFormComponent(id, submitId) {
+            const submitButton = document.getElementById(submitId);
+            const inputList = document.querySelectorAll(`#${id} input`);
+
+            let isValid = false;
+            // すべてのinput要素の入力中にバリデーションをチェックする
+            for (const input of inputList) {
+                input.addEventListener('input', () => {
+                    // バリデーション状態の結果に応じてボタンの活性状態を切り替え
+                    submitButton.disabled = !isValidateInput(inputList)
+                });
+            }
+        }
+
+        /**
+        * validate input.
+        * @param {NodeList<Element>} inputList
+        * @return {boolean}
+        */
+        function isValidateInput(inputList) {
+            const validList = [];
+            for (const input of inputList) {
+                const isValid = input.checkValidity()
+                validList.push(isValid);
+                if (!isValid) {
+                    break
+                }
+            }
+            return validList.every((v) => !!v);
+        }
+    </script>
 @stop
